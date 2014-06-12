@@ -1,0 +1,138 @@
+<html>
+<head>
+</head>
+<h1>[STATUS] Finite Fault Results for the [DATE] Mw [MAG] [LOCATION]
+Earthquake (Version [VERSION])</h1>
+<hr/>
+<h1>DATA Process and Inversion </h1>
+<p>
+[PROCESS]
+</p>
+<hr />
+<h2>Result</h2>
+<p>
+The solutions of two nodal planes explain the data equally well. Both solutions are presented.
+</p>
+
+<!-- Fault Plane 1 -->
+<h3>Result of Fault Plane 1</h2>
+<p>Seismic moment Mo=[MOMENT1] dyne.cm<br />
+Moment Magnitude Mw=[MWMAG1]<br/>
+Strike= [STRIKE1] Dip= [DIP1] Rake= [RAKE1]<br /><hr /></p>
+<h2>Cross-section of slip distribution</h2>
+<img SRC="web1/[EVENT]_slip.png" width="600"><br /><br />
+<p>
+Cross-section of slip distribution. The strike direction of the fault plane is indicated by the black arrow and the hypocenter location is denoted by the red star. The slip amplitude are showed in color and  motion direction of the hanging wall relative to the footwall is indicated by black arrows. Contours show the rupture initiation time in seconds. 
+</p>
+<hr />
+<h2>Moment Rate Function</h2><br />
+<img SRC="web1/moment_rate.png" width="600"><br /><br />
+<p>
+Source time function, describing the rate of moment release with time after earthquake origin. 
+</p>
+<hr />
+<h2>Comparison of data and synthetic seismograms</h2><br />
+
+<!-- N blocks of bodywave plots will be inserted here -->
+[BODYBLOCK1]
+<!-- End bodywave blocks -->
+
+<!-- N blocks of surfacewave plots will be inserted here -->
+[SURFACEBLOCK1]
+<!-- End surfacewave blocks -->
+
+<img SRC="web1/[EVENT]_base.png" width="400"><br /><br />
+<p>
+Surface projection of the slip distribution superimposed on GEBCO bathymetry. Red lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude.
+</p><hr />
+<!-- End of Fault Plane 1 -->
+
+<!-- Fault Plane 2 -->
+<h3>Result of Fault Plane 2</h2>
+<p>Seismic moment Mo=[MOMENT2] dyne.cm<br />
+Moment Magnitude Mw=[MWMAG2]<br/>
+Strike= [STRIKE2] Dip= [DIP2] Rake= [RAKE1]<br /><hr /></p>
+<h2>Cross-section of slip distribution</h2>
+<img SRC="web2/[EVENT]_slip.png" width="600"><br /><br />
+<p>
+Cross-section of slip distribution. The strike direction of the fault plane is indicated by the black arrow and the hypocenter location is denoted by the red star. The slip amplitude are showed in color and  motion direction of the hanging wall relative to the footwall is indicated by black arrows. Contours show the rupture initiation time in seconds. 
+</p>
+<hr />
+<h2>Moment Rate Function</h2><br />
+<img SRC="web2/moment_rate.png" width="600"><br /><br />
+<p>
+Source time function, describing the rate of moment release with time after earthquake origin. 
+</p>
+<hr />
+<h2>Comparison of data and synthetic seismograms</h2><br />
+
+<!-- N blocks of bodywave plots will be inserted here -->
+[BODYBLOCK2]
+<!-- End bodywave blocks -->
+
+<!-- N blocks of surfacewave plots will be inserted here -->
+[SURFACEBLOCK2]
+<!-- End surfacewave blocks -->
+
+<img SRC="web2/[EVENT]_base.png" width="400"><br /><br />
+<p>
+Surface projection of the slip distribution superimposed on GEBCO bathymetry. Red lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude.
+</p><hr />
+<!-- End of Fault Plane 2 -->
+
+<h2>Scientific Analysis:</h2>
+[COMMENT]
+<hr />
+<h2>Slip Distribution</h2>
+<table width ="600:" border="0" cellspacing="0" >
+  <tr>
+    <th align="left"> Plane 1</th>
+    <th align="left"> Plane 2</th>
+  </tr>
+  <tr>
+    <td colspan=1 width="200" border="1">
+      <a href= web1/static2_out title="Text data file format showing
+      locations of slip and moment"><b>SUBFAULT FORMAT</b></a>
+    </td>
+    <td colspan=1 width="200" border="1">
+      <a href= web2/static2_out title="Text data file format showing
+      locations of slip and moment"><b>SUBFAULT FORMAT</b></a>
+    </td>
+  </tr>
+  <tr>
+    <td colspan=1 width="200" border="1">
+      <a href= web1/CMTSOLUTION title="Full CMT solution for every point in finite fault region"><b>CMTSOLUTION FORMAT</b>
+    </td>
+    <td colspan=1 width="200" border="1">
+      <a href= web2/CMTSOLUTION title="Full CMT solution for every point in finite fault region"><b>CMTSOLUTION FORMAT</b>
+    </td>
+  </tr>
+  <tr>
+    <td colspan=1 width="200" border="1">
+      <a href= web1/[EVENT]_ffm.inp title="Inversion parameters for each node in the finite fault"><b>COULOMB INPUT FORMAT</b>
+    </td>
+    <td colspan=1 width="200" border="1">
+      <a href= web2/[EVENT]_ffm.inp title="Inversion parameters for each node in the finite fault"><b>COULOMB INPUT FORMAT</b>
+    </td>
+  </tr>
+  <tr>
+    <td colspan=1 width="200" border="1">
+      <a href= web1/[EVENT].kmz  title="Finite fault map in Google
+      Earth compatible mapping format"><b>GOOGLE KMZ FORMAT</b>
+    </td>
+    <td colspan=1 width="200" border="1">
+      <a href= web2/[EVENT].kmz><b>GOOGLE KMZ FORMAT</b>
+    </td>
+  </tr>
+</table>
+<hr />
+<h2>References</h2>
+<p>Ji, C., D.J. Wald, and D.V. Helmberger, Source description of the 1999 Hector Mine, California earthquake; Part I: Wavelet domain inversion theory and resolution analysis, <it>Bull. Seism. Soc. Am.</it>, Vol 92, No. 4. pp. 1192-1207, 2002.
+<br /> <br />
+ Bassin, C., Laske, G. and Masters, G., The Current Limits of Resolution for Surface Wave Tomography in North America, EOS Trans AGU, 81, F897, 2000.
+</p><hr />
+<h2>Acknowledgement and Contact Information</h2>
+<p>
+This work is supported by the National Earthquake Information Center (NEIC) of United States Geological Survey. This web page is built and maintained by <a href="mailto:ghayes@usgs.gov"> Dr. G. Hayes </a> at the NEIC. </p>
+</body>
+</html>
