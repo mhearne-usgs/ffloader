@@ -13,6 +13,13 @@ git clone https://github.com/mhearne-usgs/ffloader.git
 
 This will create a folder called ffloader under your current directory.
 
+Updating:
+=========
+
+In the ffolder directory you created during the installation process above, type:
+
+git pull 
+
 Usage:
 =======
 There is a single program to run, called ffault.py.
