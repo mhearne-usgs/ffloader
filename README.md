@@ -5,6 +5,14 @@ Finite Fault Loader
 
 This project loads the Finite Fault product onto the USGS web site.
 
+Installation:
+=============
+To install, navigate in a Terminal to a directory above where this code should live, and type:
+
+git clone https://github.com/mhearne-usgs/ffloader.git
+
+This will create a folder called ffloader under your current directory.
+
 Usage:
 =======
 There is a single program to run, called ffault.py.
