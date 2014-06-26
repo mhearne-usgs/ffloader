@@ -20,6 +20,9 @@ CONFIGFILE = 'config.ini'
 DEVPDLPATH = '/Users/%s/ProductClient' % getpass.getuser()
 PRODPDLPATH = '/Users/%s/Desktop/ProductClient' % getpass.getuser()
 
+#default basemap caption
+DEFAULT_CAPTION = """Surface projection of the slip distribution superimposed on GEBCO bathymetry. Red lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude."""
+
 #required size of the base map for web page
 WEB_MAP_WIDTH = 304
 #output name for web base map
@@ -281,7 +284,7 @@ def getWavePlots(ffmdir):
     surfacefiles = glob.glob(os.path.join(ffmdir,FILE_PATTERNS['surfacewave']))
     return (bodyfiles,surfacefiles)
 
-def fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles,surfacefiles,version,onePlane=True,planeNumber=1):
+def fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles,surfacefiles,version,caption,onePlane=True,planeNumber=1):
     location = getLocation(eventdict['lat'],eventdict['lon'])
     htmldata = htmldata.replace('[DATE]',eventdict['time'].strftime('%b %d, %Y'))
     htmldata = htmldata.replace('[MAG]','%.1f' % eventdict['magnitude'])
@@ -290,6 +293,7 @@ def fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles,surfacefiles,version
     htmldata = htmldata.replace('[RESULT]','%s' % eventdict['result'])
     htmldata = htmldata.replace('[EVENT]','%s' % eventcode)
     htmldata = htmldata.replace('[COMMENT]','%s' % comment)
+    htmldata = htmldata.replace('[BASEMAP_CAPTION]','%s' % caption)
     if version == 1:
         htmldata = htmldata.replace('[STATUS]','Preliminary')
     else:
@@ -476,6 +480,13 @@ if __name__ == '__main__':
     %prog us b0006bqc /home/ghayes/ffmdata/b0006bqc /home/ghayes/ffmdata/b0006bqc2
     OR (single plane solution with comment)
     %prog us b0006bqc /home/ghayes/ffmdata/b0006bqc /home/ghayes/ffmdata/b0006bqc2 -c"This earthquake is very deadly."
+
+    Note: It is possible to modify the caption for the basemap by creating a file called basemap_caption.txt
+    in the finite fault directory (or in the case where there are two, in either one).  This file should contain
+    the desired caption for the basemap image.  If no such file is found, then the caption will read:
+
+    "Surface projection of the slip distribution superimposed on GEBCO bathymetry. Red lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude."
+    
     """
     parser = OptionParser(usage=usage)
     parser.add_option("-c", "--comment", dest="comment",
@@ -516,6 +527,7 @@ if __name__ == '__main__':
     eventcode = args[1]
     eventid = net+eventcode
     pdlfolder = os.path.join(BASE_PDL_FOLDER,eventid)
+    
     if len(args) == 3:
         bodyfiles2 = []
         surfacefiles2 = []
@@ -530,7 +542,16 @@ if __name__ == '__main__':
         htmloutfile = os.path.join(pdlfolder,'%s.html' % eventcode)
         htmldata = open(html1,'rt').read()
         bodyfiles1,surfacefiles1 = getWavePlots(ffmdir)
-        htmldata = fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles1,surfacefiles1,version)
+
+        #if there is a basemap_caption.txt file present, read in that text and insert it
+        #into the HTML in [BASEMAP_CAPTION] macro
+        captionfile = os.path.join(ffmdir,'basemap_caption.txt')
+        if os.path.isfile(captionfile):
+            caption = open(captionfile,'rt').read()
+        else:
+            caption = DEFAULT_CAPTION
+        
+        htmldata = fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles1,surfacefiles1,version,caption)
         makeWebMap(webfolder)
         f = open(htmloutfile,'wt')
         f.write(htmldata)
@@ -539,6 +560,18 @@ if __name__ == '__main__':
     else:
         ffmdir1 = args[2]
         ffmdir2 = args[3]
+
+        #if there is a basemap_caption.txt file present in either folder, read in that text and insert it
+        #into the HTML in [BASEMAP_CAPTION] macro
+        captionfile1 = os.path.join(ffmdir1,'basemap_caption.txt')
+        captionfile2 = os.path.join(ffmdir2,'basemap_caption.txt')
+        if os.path.isfile(captionfile1):
+            caption = open(captionfile1,'rt').read()
+        elif os.path.isfile(captionfile2):
+            caption = open(captionfile2,'rt').read()
+        else:
+            caption = DEFAULT_CAPTION
+        
         #first plane
         #copy the files first
         webfolder1 = os.path.join(pdlfolder,'web1')
