@@ -516,10 +516,10 @@ if __name__ == '__main__':
     eventcode = args[1]
     eventid = net+eventcode
     pdlfolder = os.path.join(BASE_PDL_FOLDER,eventid)
-    if len(args) == 2:
+    if len(args) == 3:
         bodyfiles2 = []
         surfacefiles2 = []
-        ffmdir = args[1]
+        ffmdir = args[2]
         #copy the files first
         webfolder = os.path.join(pdlfolder,'web')
         if not os.path.isdir(webfolder):
@@ -537,8 +537,8 @@ if __name__ == '__main__':
         f.close()
         createHTMLFragments([eventdict],comment,pdlfolder)
     else:
-        ffmdir1 = args[1]
-        ffmdir2 = args[2]
+        ffmdir1 = args[2]
+        ffmdir2 = args[3]
         #first plane
         #copy the files first
         webfolder1 = os.path.join(pdlfolder,'web1')
