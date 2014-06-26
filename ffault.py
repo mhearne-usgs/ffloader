@@ -39,7 +39,7 @@ BASE_PDL_FOLDER = '/Users/%s/pdloutput/' % getpass.getuser()
 
 #list of file patterns to copy from input folder(s) to output folder
 FILE_PATTERNS = {'bodywave':'*bwave*.png','surfacewave':'*swave*.png',
-                 'basemap':'*base*.png','moment':'moment_rate.png','ge':'*ge*.png',
+                 'basemap':'*base*.png','moment':'mr.png','ge':'*ge*.png',
                  'slip':'*slip*.png','static':'static2_out','cmt':'CMTSOLUTION',
                  'inp':'*.inp','kml':'*.kml','kmz':'*.kmz'}
 
