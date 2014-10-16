@@ -583,7 +583,7 @@ if __name__ == '__main__':
         htmloutfile = os.path.join(pdlfolder,'%s.html' % eventcode)
         htmldata = open(html2,'rt').read()
         bodyfiles1,surfacefiles1 = getWavePlots(ffmdir1)
-        htmldata = fillHTML(eventdict1,htmldata,comment,eventcode,bodyfiles1,surfacefiles1,version,onePlane=False,planeNumber=1)
+        htmldata = fillHTML(eventdict1,htmldata,comment,eventcode,bodyfiles1,surfacefiles1,version,caption,onePlane=False,planeNumber=1)
         makeWebMap(webfolder1)
         #second plane
         #copy the files first
@@ -594,7 +594,7 @@ if __name__ == '__main__':
         eventdict2 = getEventInfo(ffmdir2)
         eventdict2 = makeTextBlocks([eventdict2])[0]
         bodyfiles2,surfacefiles2 = getWavePlots(ffmdir2)
-        htmldata = fillHTML(eventdict2,htmldata,comment,eventcode,bodyfiles2,surfacefiles2,version,onePlane=False,planeNumber=2)
+        htmldata = fillHTML(eventdict2,htmldata,comment,eventcode,bodyfiles2,surfacefiles2,version,caption,onePlane=False,planeNumber=2)
         #write out the html data
         f = open(htmloutfile,'wt')
         f.write(htmldata)
