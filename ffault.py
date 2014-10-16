@@ -29,7 +29,7 @@ WEB_MAP_WIDTH = 304
 OUTPUT_BASEMAP = 'basemap.png'
 
 #depending on whether user is "gavin" or "mhearne", choose one of these
-PRODCMD = "java -jar [JARFILE] --configFile=[CONFIGFILE] --send --source=us --type=finite-fault --code=[NET][EVENTCODE] --directory=[FFMDIR] --privateKey=/Users/gavin/Desktop/ProductClient/id_dsa_ffm --trackerURL=http://ehppdl1.cr.usgs.gov/tracker/ --eventsource=[NET] --eventsourcecode=[EVENTCODE] [PROPERTIES]"
+PRODCMD = "java -jar [JARFILE] --configFile=[CONFIGFILE] --send --source=us --type=finite-fault --code=[NET][EVENTCODE] --directory=[FFMDIR] --privateKey=/Users/%s/Desktop/ProductClient/id_dsa_ffm --trackerURL=http://ehppdl1.cr.usgs.gov/tracker/ --eventsource=[NET] --eventsourcecode=[EVENTCODE] [PROPERTIES]" % getpass.getuser()
 
 DEVCMD = "java -jar [JARFILE] --configFile=[CONFIGFILE] --send --source=us --type=finite-fault --code=[NET][EVENTCODE] --directory=[FFMDIR] --eventsource=[NET] --eventsourcecode=[EVENTCODE] [PROPERTIES]"
 
