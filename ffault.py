@@ -131,7 +131,7 @@ HTMLFRAGMENT = """<div>
 
 possiblelocs = ['/usr/bin','/bin','/usr/local/bin','/sw/bin',
                 os.path.join(os.path.expanduser("~"),'bin'),
-                '/home/shake/bin','/opt/local/bin']
+                '/home/shake/bin','/opt/local/bin','/opt/ImageMagick/bin/']
 
 def findbinary(bin):
     """
