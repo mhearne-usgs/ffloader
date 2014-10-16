@@ -89,37 +89,37 @@ CONTENTSSURFACEBLOCK = """<!-- This will need to repeated for all surface wave f
     <format href="web[PLANE]/[EVENT]_swave_[V].png" type="image/png"/>
   </file>"""
 
-BODYBLOCK = """<img SRC="web/[EVENT]_bwave_[V].png" width="600"><br /><br />
+BODYBLOCK = """<img SRC="web/[EVENT]_bwave_[V].png"><br /><br />
 <p>
 Comparison of teleseismic body waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meters. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
 </p>
 <hr />"""
 
-BODYBLOCK1 = """<img SRC="web1/[EVENT]_bwave_[V].png" width="600"><br /><br />
+BODYBLOCK1 = """<img SRC="web1/[EVENT]_bwave_[V].png"><br /><br />
 <p>
 Comparison of teleseismic body waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meters. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
 </p>
 <hr />"""
 
-BODYBLOCK2 = """<img SRC="web2/[EVENT]_bwave_[V].png" width="600"><br /><br />
+BODYBLOCK2 = """<img SRC="web2/[EVENT]_bwave_[V].png"><br /><br />
 <p>
 Comparison of teleseismic body waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meters. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
 </p>
 <hr />"""
 
-SURFACEBLOCK = """<img SRC="web/[EVENT]_swave_[V].png" width="600"><br /><br />
+SURFACEBLOCK = """<img SRC="web/[EVENT]_swave_[V].png"><br /><br />
 <p>
 Comparison of long period surface waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meter. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
 </p>
 <hr />"""
 
-SURFACEBLOCK1 = """<img SRC="web1/[EVENT]_swave_[V].png" width="600"><br /><br />
+SURFACEBLOCK1 = """<img SRC="web1/[EVENT]_swave_[V].png"><br /><br />
 <p>
 Comparison of long period surface waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meter. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
 </p>
 <hr />"""
 
-SURFACEBLOCK2 = """<img SRC="web2/[EVENT]_swave_[V].png" width="600"><br /><br />
+SURFACEBLOCK2 = """<img SRC="web2/[EVENT]_swave_[V].png"><br /><br />
 <p>
 Comparison of long period surface waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meter. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
 </p>
