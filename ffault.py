@@ -153,7 +153,7 @@ def makeWebMap(webfolder):
     if convertbin is None:
         return
     pdlfolder,web = os.path.split(os.path.abspath(webfolder))
-    basemap = glob.glob(os.path.join(webfolder,'*_base.png'))
+    basemap = glob.glob(os.path.join(webfolder,'*_basemap.png'))
     if len(basemap):
         basemap = basemap[0]
     else:
