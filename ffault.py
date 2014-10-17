@@ -602,7 +602,7 @@ if __name__ == '__main__':
         createHTMLFragments([eventdict1,eventdict2],comment,pdlfolder)
     createContents(eventid,pdlfolder,bodyfiles1,bodyfiles2,surfacefiles1,surfacefiles2)
     if not options.doReview:
-        if len(args) > 2:
+        if len(args) > 3:
             cmd = generateCmdLine([eventdict1,eventdict2],eventid,pdlfolder)
         else:
             cmd = generateCmdLine([eventdict],eventid,pdlfolder)
