@@ -236,13 +236,18 @@ def generateCmdLine(eventdicts,eventid,output):
 def createContents(eventid,outdir,bodywaves1,bodywaves2,surfacewaves1,surfacewaves2):
     eventcode = eventid[2:]
     bodytext = ''
+    #determine whether we're in a single or double plane situation
+    plane1 = '1'
+    plane2 = '2'
+    if not len(bodywaves2):
+        plane1 = ''
     for fname in bodywaves1:
         fbase,fext = os.path.splitext(fname)
         parts = fbase.split('_')
         sequence = parts[-1]
         block = CONTENTSBODYBLOCK.replace('[EVENT]',eventcode)
         block = block.replace('[V]',sequence)
-        block = block.replace('[PLANE]','1')
+        block = block.replace('[PLANE]',plane1)
         bodytext += block
     for fname in bodywaves2:
         fbase,fext = os.path.splitext(fname)
@@ -250,7 +255,7 @@ def createContents(eventid,outdir,bodywaves1,bodywaves2,surfacewaves1,surfacewav
         sequence = parts[-1]
         block = CONTENTSBODYBLOCK.replace('[EVENT]',eventcode)
         block = block.replace('[V]',sequence)
-        block = block.replace('[PLANE]','2')
+        block = block.replace('[PLANE]',plane2)
         bodytext += block
     surfacetext = ''
     for fname in surfacewaves1:
@@ -259,7 +264,7 @@ def createContents(eventid,outdir,bodywaves1,bodywaves2,surfacewaves1,surfacewav
         sequence = parts[-1]
         block = CONTENTSSURFACEBLOCK.replace('[EVENT]',eventcode)
         block = block.replace('[V]',sequence)
-        block = block.replace('[PLANE]','1')
+        block = block.replace('[PLANE]',plane1)
         surfacetext += block
     for fname in surfacewaves2:
         fbase,fext = os.path.splitext(fname)
@@ -267,7 +272,7 @@ def createContents(eventid,outdir,bodywaves1,bodywaves2,surfacewaves1,surfacewav
         sequence = parts[-1]
         block = CONTENTSSURFACEBLOCK.replace('[EVENT]',eventcode)
         block = block.replace('[V]',sequence)
-        block = block.replace('[PLANE]','2')
+        block = block.replace('[PLANE]',plane2)
         surfacetext += block
     
     contents = CONTENTS.replace('[BODYBLOCK]',bodytext)
