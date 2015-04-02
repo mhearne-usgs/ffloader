@@ -21,7 +21,7 @@ DEVPDLPATH = '/Users/%s/ProductClient' % getpass.getuser()
 PRODPDLPATH = '/Users/%s/Desktop/ProductClient' % getpass.getuser()
 
 #default basemap caption
-DEFAULT_CAPTION = """Surface projection of the slip distribution superimposed on GEBCO bathymetry. Red lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude."""
+DEFAULT_CAPTION = """Surface projection of the slip distribution superimposed on GEBCO bathymetry. Thick white lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude."""
 
 #required size of the base map for web page
 WEB_MAP_WIDTH = 304
@@ -41,10 +41,18 @@ TEMPLATE2 = 'template2.html'
 BASE_PDL_FOLDER = '/Users/%s/pdloutput/' % getpass.getuser()
 
 #list of file patterns to copy from input folder(s) to output folder
-FILE_PATTERNS = {'bodywave':'*bwave*.png','surfacewave':'*swave*.png',
-                 'basemap':'*base*.png','moment':'mr.png','ge':'*ge*.png',
-                 'slip':'*slip*.png','static':'static2_out','cmt':'CMTSOLUTION',
-                 'inp':'*.inp','kml':'*.kml','kmz':'*.kmz'}
+FILE_PATTERNS = {'bodywave':'*bwave*.png',
+                 'surfacewave':'*swave*.png',
+                 'basemap':'*base*.png',
+                 'moment':'mr.png',
+                 'ge':'*ge*.png',
+                 'slip':'*slip*.png',
+                 'static':'*.param',
+                 'cmt':'CMTSOLUTION',
+                 'inp':'*.inp',
+                 'kml':'*.kml',
+                 'kmz':'*.kmz',
+                 'moment_text':'*.param'}
 
 CONTENTS = """<contents>
   <!-- Full listing of files -->
@@ -59,69 +67,134 @@ CONTENTS = """<contents>
 
   [SURFACEBLOCK]
 
+  <file title="Base Map" id="cmtsolution">
+    <caption>
+      <![CDATA[ Map of finite fault showing it's geographic context ]]>
+    </caption>
+    <format href="web[PLANE]/[EVENT]_basemap.png" type="image/png"/>
+  </file>
+
   <file title="CMT Solution" id="cmtsolution">
     <caption>
       <![CDATA[ Full CMT solution for every point in finite fault region ]]>
     </caption>
-    <format href="CMTSOLUTION" type="text/plain"/>
+    <format href="web[PLANE]/CMTSOLUTION" type="text/plain"/>
   </file>
 
-  <file title="Inversion Parameters File" id="inpfile">
+  <file title="Inversion Parameters File 1" id="inpfile1">
     <caption>
-      <![CDATA[ Inversion parameters for each node in the finite fault ]]>
+      <![CDATA[ Basic inversion parameters for each node in the finite fault ]]>
     </caption>
-    <format href="[EVENT]_ffm.inp" type="text/plain"/>
+    <format href="web[PLANE]/[EVENT].param" type="text/plain"/>
+  </file>
+
+  <file title="Inversion Parameters File 2" id="inpfile2">
+    <caption>
+      <![CDATA[ Complete inversion parameters for the finite fault, following the SRCMOD FSP format (http://equake-rc.info/) ]]>
+    </caption>
+    <format href="web[PLANE]/[EVENT].fsp" type="text/plain"/>
+  </file>
+
+  <file title="Coulomb Input File" id="coulomb">
+    <caption>
+      <![CDATA[ Format necessary for compatibility with Coulomb3 (http://earthquake.usgs.gov/research/software/coulomb/) ]]>
+    </caption>
+    <format href="web[PLANE]/[EVENT]_coulomb.inp" type="text/plain"/>
+  </file>
+  
+  <file title="Moment Rate Function File" id="momentratefile">
+    <caption>
+      <![CDATA[ Ascii file of time vs. moment rate, used for plotting source time function ]]>
+    </caption>
+    <format href="web[PLANE]/[EVENT].param" type="text/plain"/>
+  </file>
+
+  <file title="Surface Deformation File" id="surfacedeformationfile">
+    <caption>
+      <![CDATA[ Surface displacement resulting from finite fault, calculated using Okada-style deformation codes ]]>
+    </caption>
+    <format href="web[PLANE]/[EVENT].disp" type="text/plain"/>
   </file>
 </contents>"""
 
-CONTENTSBODYBLOCK = """<file title="Body Waves Plot" id="bodywave[V]">
+CONTENTSBODYBLOCK = """\n<file title="Body Waves Plot" id="bodywave[V]">
     <caption>
       <![CDATA[ Multi-panel plot showing body wave data from all contributing stations ]]>
     </caption>
     <format href="web[PLANE]/[EVENT]_bwave_[V].png" type="image/png"/>
   </file>"""
 
-CONTENTSSURFACEBLOCK = """<!-- This will need to repeated for all surface wave files  -->
+CONTENTSSURFACEBLOCK = """\n<!-- This will need to repeated for all surface wave files  -->
   <file title="Surface Waves Plot" id="surfacewave[V]">
     <caption>
       <![CDATA[ Multi-panel plot showing body wave data from all contributing stations ]]>
     </caption>
     <format href="web[PLANE]/[EVENT]_swave_[V].png" type="image/png"/>
-  </file>"""
+  </file>\n"""
 
 BODYBLOCK = """<img SRC="web/[EVENT]_bwave_[V].png"><br /><br />
 <p>
-Comparison of teleseismic body waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meters. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
+Comparison of teleseismic body waves. Data are shown in black and synthetic seismograms 
+are plotted in red. Both data and synthetic seismograms are aligned on the P or 
+SH arrivals. The number at the end of each trace is the peak amplitude of the 
+observation in micro-meters. The number above the beginning of each trace is 
+the source azimuth; below is the epicentral distance. Shading describes relative 
+weighting of the waveforms.
 </p>
 <hr />"""
 
 BODYBLOCK1 = """<img SRC="web1/[EVENT]_bwave_[V].png"><br /><br />
 <p>
-Comparison of teleseismic body waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meters. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
+Comparison of teleseismic body waves. Data are shown in black and synthetic seismograms 
+are plotted in red. Both data and synthetic seismograms are aligned on the P or 
+SH arrivals. The number at the end of each trace is the peak amplitude of the 
+observation in micro-meters. The number above the beginning of each trace is 
+the source azimuth; below is the epicentral distance. Shading describes relative 
+weighting of the waveforms.
 </p>
 <hr />"""
 
 BODYBLOCK2 = """<img SRC="web2/[EVENT]_bwave_[V].png"><br /><br />
 <p>
-Comparison of teleseismic body waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meters. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
+Comparison of teleseismic body waves. Data are shown in black and synthetic seismograms 
+are plotted in red. Both data and synthetic seismograms are aligned on the P or 
+SH arrivals. The number at the end of each trace is the peak amplitude of the 
+observation in micro-meters. The number above the beginning of each trace is 
+the source azimuth; below is the epicentral distance. Shading describes relative 
+weighting of the waveforms.
 </p>
 <hr />"""
 
 SURFACEBLOCK = """<img SRC="web/[EVENT]_swave_[V].png"><br /><br />
 <p>
-Comparison of long period surface waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meter. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
+Comparison of long period surface waves. Data are shown in black and synthetic 
+seismograms are plotted in red. Both data and synthetic seismograms are aligned on 
+the P or SH arrivals. The number at the end of each trace is the peak amplitude of 
+the observation in micro-meters. The number above the beginning of each trace is 
+the source azimuth and below is the epicentral distance. Shading describes relative 
+weighting of the waveforms.
 </p>
 <hr />"""
 
 SURFACEBLOCK1 = """<img SRC="web1/[EVENT]_swave_[V].png"><br /><br />
 <p>
-Comparison of long period surface waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meter. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
+Comparison of long period surface waves. Data are shown in black and synthetic 
+seismograms are plotted in red. Both data and synthetic seismograms are aligned on 
+the P or SH arrivals. The number at the end of each trace is the peak amplitude of 
+the observation in micro-meters. The number above the beginning of each trace is 
+the source azimuth and below is the epicentral distance. Shading describes relative 
+weighting of the waveforms.
 </p>
 <hr />"""
 
 SURFACEBLOCK2 = """<img SRC="web2/[EVENT]_swave_[V].png"><br /><br />
 <p>
-Comparison of long period surface waves. The data are shown in black and the synthetic seismograms are plotted in red. Both data and synthetic seismograms are aligned on the P or SH arrivals. The number at the end of each trace is the peak amplitude of the observation in micro-meter. The number above the beginning of each trace is the source azimuth and below is the epicentral distance. Shading describes relative weighting of the waveforms.
+Comparison of long period surface waves. Data are shown in black and synthetic 
+seismograms are plotted in red. Both data and synthetic seismograms are aligned on 
+the P or SH arrivals. The number at the end of each trace is the peak amplitude of 
+the observation in micro-meters. The number above the beginning of each trace is 
+the source azimuth and below is the epicentral distance. Shading describes relative 
+weighting of the waveforms.
 </p>
 <hr />"""
 
@@ -274,8 +347,10 @@ def createContents(eventid,outdir,bodywaves1,bodywaves2,surfacewaves1,surfacewav
         block = block.replace('[V]',sequence)
         block = block.replace('[PLANE]',plane2)
         surfacetext += block
+
     
     contents = CONTENTS.replace('[BODYBLOCK]',bodytext)
+    contents = contents.replace('[PLANE]',plane1)
     contents = contents.replace('[SURFACEBLOCK]',surfacetext)
     contents = contents.replace('[EVENT]',eventcode)
     cfile = os.path.join(outdir,'contents.xml')
@@ -468,7 +543,7 @@ def makeTextBlocks(eventdicts):
         elif eventdict['numlow'] == 0:
             eventdict['process'] += ' and %i broadband SH waveforms ' % eventdict['nums']
         eventdict['process'] += 'selected based upon data quality and azimuthal distribution. Waveforms are first converted to displacement by removing the instrument response and then used to constrain the slip history based on a finite fault inverse algorithm (Ji et al., 2002). '
-        eventdict['process'] += 'We use the NEIC hypocenter (Lon.=%.1f deg.; Lat.=%.1f deg.). ' % (eventdict['lon'],eventdict['lat'])
+        eventdict['process'] += 'We use the NEIC hypocenter (Lon.=%.1f deg.; Lat.=%.1f deg., Dep=%.1f km). ' % (eventdict['lon'],eventdict['lat'],eventdict['depth'])
         eventdict['process'] += 'The fault planes are defined using the rapid W-Phase moment tensor solution of the NEIC.'
 
         #fill in the paragraph describing the result for a single plane solution
