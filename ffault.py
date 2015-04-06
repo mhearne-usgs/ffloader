@@ -54,6 +54,52 @@ FILE_PATTERNS = {'bodywave':'*bwave*.png',
                  'kmz':'*.kmz',
                  'moment_text':'*.param'}
 
+PROCESS_TEMPLATE_LONG = """We used GSN broadband waveforms downloaded from the NEIC waveform server.
+We analyzed [XX] teleseismic broadband P waveforms, [YY] broadband SH waveforms, 
+and [ZZ] long period surface waves selected based on data quality and azimuthal 
+distribution. Waveforms are first converted to displacement by removing the 
+instrument response and are then used to constrain the slip history using a finite 
+fault inverse algorithm (Ji et al., 2002). We begin modeling using a hypocenter 
+matching or adjusted slightly from the initial NEIC solution (Lon. = [AA] deg.; Lat. = 
+[BB] deg., Dep. = [CC] km), and a fault plane defined using either the rapid W-Phase 
+moment tensor (for near-real time solutions), or the gCMT moment tensor (for 
+historic solutions)."""
+
+PROCESS_TEMPLATE_NOLONG = """We used GSN broadband waveforms downloaded from the NEIC waveform
+server.  We analyzed [XX] teleseismic broadband P waveforms and [YY]
+broadband SH waveforms selected based on data quality and azimuthal
+distribution. Waveforms are first converted to displacement by
+removing the instrument response and are then used to constrain the
+slip history using a finite fault inverse algorithm (Ji et al.,
+2002). We begin modeling using a hypocenter matching or adjusted
+slightly from the initial NEIC solution (Lon. = [AA] deg.; Lat. = [BB]
+deg., Dep. = [CC] km), and a fault plane defined using either the
+rapid W-Phase moment tensor (for near-real time solutions), or the
+gCMT moment tensor (for historic solutions)."""
+
+RESULT_TEMPLATE = """After comparing waveform fits based on the two planes of the input
+moment tensor, we find that the nodal plane (strike= [DD] deg., dip= [EE]
+deg.) fits the data better. The seismic moment release based upon this
+plane is [FF] dyne.cm (Mw = [GG]) using a 1D crustal model interpolated
+from CRUST2.0 (Bassin et al., 2000)."""
+
+RESULT_TEMPLATE_SEGMENTS = """After comparing waveform fits based on the two planes of the input
+moment tensor, we find that a solution adjusted from the nodal plane
+striking towards [DD] deg. fits the data better. The adjusted solution
+uses [HH] plane segments (see Table 1 below) designed to
+match a priori knowledge of the fault (e.g., 3D slab geometry). The
+seismic moment release based upon this solution is [FF] dyne.cm (Mw =
+[GG]) using a 1D crustal model interpolated from CRUST2.0 (Bassin et
+al., 2000).
+
+<table border="1">
+<tr><th>Segment</th><th>Strike (deg.)</th><th>Dip (deg.)</th></tr>
+[SEGMENTS]
+</table>
+<br>
+<i>Table 1. Multi-Segment Parameters.</i>
+"""
+
 CONTENTS = """<contents>
   <!-- Full listing of files -->
   <file title="Base Map" id="basemap">
@@ -383,9 +429,9 @@ def fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles,surfacefiles,version
       magnitude = (math.log10(eventdict['moment'])-16.1)/1.5
       htmldata = htmldata.replace('[MOMENT%i]' % planeNumber,'%.3g' % eventdict['moment'])
       htmldata = htmldata.replace('[MWMAG%i]' % planeNumber,'%.1f' % magnitude)
-      htmldata = htmldata.replace('[STRIKE%i]' % planeNumber,'%.1f' % eventdict['strike'])
-      htmldata = htmldata.replace('[DIP%i]' % planeNumber,'%.1f' % eventdict['dip'])
-      htmldata = htmldata.replace('[RAKE%i]' % planeNumber,'%.1f' % eventdict['rake'])
+      htmldata = htmldata.replace('[STRIKE%i]' % planeNumber,'%.1f' % eventdict['strike1'])
+      htmldata = htmldata.replace('[DIP%i]' % planeNumber,'%.1f' % eventdict['dip1'])
+      htmldata = htmldata.replace('[RAKE%i]' % planeNumber,'%.1f' % eventdict['rake1'])
       bodytext = ''
       for bodyfile in bodyfiles:
           fpath,fname = os.path.split(bodyfile)
@@ -484,12 +530,33 @@ def countWaves(wavefile):
             np += 1
     return (np,ns)
 
-def getEventInfo(inputfolder):
+def readMulti(eventfile):
+    """
+    2015 3 29 23 #date hour
+    255.16 20.26 83.16 2.47e+20 #??
+    -4.8812 152.5964 2015 3 29 23 #lat lon year month day hour (again)
+    0.2 10 0
+    1 1 5
+    2.5
+    3 9 6 #number of segments, line 7
+    1
+    30 255 83 1 # dip strike ? ? for segment 1 (line 9)
+    17 5 0
+    9 1 1 41 #line 11, ? ? ? depth
+    2
+    25 255 83 1 # dip strike ? ? for segment 2 on line (segment number * 6) + 1
+    17 5 0
+    9 6
+    1 1 1 1 1
+    1 6 1 1
+    3
+    20 255 83 1 #dip strike ? ? for segment 3 on line (segment number * 6) + 1
+    17 10 0
+    9 16
+    2 1 1 1 1
+    1 11 1 1
+    """
     eventdict = {}
-    eventfile = os.path.join(inputfolder,'Event_mult.in')
-    plotfile = os.path.join(inputfolder,'plot_info')
-    wavefile = os.path.join(inputfolder,'Readlp.das')
-    lowfile = os.path.join(inputfolder,'synm.str_low')
     lines = open(eventfile,'rt').readlines()
     #date/time info is in the first line of this file
     tparts = [int(p) for p in lines[0].split()] #list of integers: year, month, day, hour
@@ -498,15 +565,41 @@ def getEventInfo(inputfolder):
     gparts = lines[2].split()
     eventdict['lat'] = float(gparts[0])
     eventdict['lon'] = float(gparts[1])
+    #the flag for multiple segments of one plane is found in the 7th line of this file
+    gparts = lines[6].split()
+    eventdict['numsegments'] = int(gparts[0])
     #depth is in the 11th line in this file
     dparts = lines[10].split()
     eventdict['depth'] = float(dparts[3])
+    #first dip and strike are on line 9
+    dip1,strike1,rake1,tmp2 = [float(x) for x in lines[8].split()]
+    eventdict['dip1'] = dip1
+    eventdict['strike1'] = strike1
+    eventdict['rake1'] = rake1
+    if eventdict['numsegments'] > 1:
+        for i in range(1,eventdict['numsegments']):
+            lineno = (i+1)*6
+            dip,strike,rake,tmp = [float(x) for x in lines[lineno].split()]
+            keydip = 'dip%i' % (i+1)
+            keystrike = 'strike%i' % (i+1)
+            keyrake = 'rake%i' % (i+1)
+            eventdict[keydip] = dip
+            eventdict[keystrike] = strike
+            eventdict[keyrake] = rake
+    return eventdict
+    
+def getEventInfo(inputfolder):
+    eventdict = {}
+    eventfile = os.path.join(inputfolder,'Event_mult.in')
+    plotfile = os.path.join(inputfolder,'plot_info')
+    wavefile = os.path.join(inputfolder,'Readlp.das')
+    lowfile = os.path.join(inputfolder,'synm.str_low')
+    tmpdict = readMulti(eventfile)
+    eventdict.update(tmpdict)
+    
     #strike dip and rake are in the first line of this file
     lines = open(plotfile,'rt').readlines()
     mparts = lines[0].split()
-    eventdict['strike'] = float(mparts[0])
-    eventdict['dip'] = float(mparts[1])
-    eventdict['rake'] = float(mparts[2])
     eventdict['moment'] = float(mparts[3])
     #moment magnitude is in the last line of this file
     eventdict['magnitude'] = float(lines[-1].strip())
@@ -533,21 +626,42 @@ def makeTextBlocks(eventdicts):
     textdicts = {}
     eventcounter = 0
     for eventdict in eventdicts:
-        #Fill in the paragraph describing data processing steps
-        eventdict['process'] = 'We used GSN broadband waveforms downloaded from the NEIC waveform server.'
-        if eventdict['nump']:
-            eventdict['process'] += 'We analyzed %i teleseismic broadband P waveforms' % eventdict['nump']
-        if eventdict['nums'] and eventdict['numlow']:
-            tpl = (eventdict['nums'],eventdict['numlow'])
-            eventdict['process'] += ', %i broadband SH waveforms, and %i long period surface waves ' % tpl
-        elif eventdict['numlow'] == 0:
-            eventdict['process'] += ' and %i broadband SH waveforms ' % eventdict['nums']
-        eventdict['process'] += 'selected based upon data quality and azimuthal distribution. Waveforms are first converted to displacement by removing the instrument response and then used to constrain the slip history based on a finite fault inverse algorithm (Ji et al., 2002). '
-        eventdict['process'] += 'We use the NEIC hypocenter (Lon.=%.1f deg.; Lat.=%.1f deg., Dep=%.1f km). ' % (eventdict['lon'],eventdict['lat'],eventdict['depth'])
-        eventdict['process'] += 'The fault planes are defined using the rapid W-Phase moment tensor solution of the NEIC.'
+        if eventdict['numlow']:
+            process = PROCESS_TEMPLATE_LONG
+        else:
+            process = PROCESS_TEMPLATE_NOLONG
+        process = process.replace('[XX]','%i' % eventdict['nump'])
+        process = process.replace('[YY]','%i' % eventdict['nums'])
+        if eventdict['numlow']:
+            process = process.replace('[ZZ]','%i' % eventdict['numlow'])
+        process = process.replace('[AA]','%.1f' % eventdict['lon'])
+        process = process.replace('[BB]','%.1f' % eventdict['lat'])
+        process = process.replace('[CC]','%.1f' % eventdict['depth'])
+        eventdict['process'] = process
 
         #fill in the paragraph describing the result for a single plane solution
-        eventdict['result'] = 'After comparing the waveform fits based on two planes, we find that the nodal plane (strike=%.1f deg., dip=%.1f deg.) fits the data better. The seismic moment release based upon this plane is %.3g dyne.cm using a 1D crustal model interpolated from CRUST2.0 (Bassin et al., 2000).' % (eventdict['strike'],eventdict['dip'],eventdict['moment'])
+        if eventdict['numsegments'] == 1:
+            result = RESULT_TEMPLATE
+        else:
+            result = RESULT_TEMPLATE_SEGMENTS
+            segment_template = '<tr><td>[NUM]</td><td>[DD]</td><td>[EE]</td></tr>\n'
+            segmentstr = ''
+            for i in range(0,eventdict['numsegments']):
+                segtemp = segment_template
+                segnum = i+1
+                ddkey = 'strike%i' % (segnum)
+                eekey = 'dip%i' % (segnum)
+                segtemp = segtemp.replace('[NUM]','%i' % segnum)
+                segtemp = segtemp.replace('[DD]','%.1f' % eventdict[ddkey])
+                segtemp = segtemp.replace('[EE]','%.1f' % eventdict[eekey])
+                segmentstr += segtemp
+            result = result.replace('[SEGMENTS]',segmentstr)
+        result = result.replace('[DD]','%.1f' % eventdict['strike1'])
+        result = result.replace('[EE]','%.1f' % eventdict['dip1'])
+        result = result.replace('[FF]','%.1e' % eventdict['moment'])
+        result = result.replace('[GG]','%.1f' % eventdict['magnitude'])
+        result = result.replace('[HH]','%i' % eventdict['numsegments'])
+        eventdict['result'] = result
 
     return eventdicts
 

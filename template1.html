@@ -4,6 +4,7 @@
 <h1>[STATUS] Finite Fault Results for the [DATE] Mw [MAG] [LOCATION]
 Earthquake (Version [VERSION]) </h1>
 <hr/>
+
 <h1>DATA Process and Inversion </h1>
 <p>
 [PROCESS]
@@ -13,6 +14,14 @@ Earthquake (Version [VERSION]) </h1>
 <p>
 [RESULT]
 </p>
+
+<img SRC="web/[EVENT]_basemap.png"><br /><br />
+<p>
+[BASEMAP_CAPTION]
+<!-- Surface projection of the slip distribution superimposed on GEBCO -->
+<!-- bathymetry. Thick white lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude. -->
+</p><hr />
+
 <h2>Cross-section of slip distribution</h2>
 <img SRC="web/[EVENT]_slip2.png"><br /><br />
 <p>
@@ -41,30 +50,9 @@ the top right corner of the plot).
 [SURFACEBLOCK]
 <!-- End surfacewave blocks -->
 
-<img SRC="web/[EVENT]_basemap.png"><br /><br />
-<p>
-[BASEMAP_CAPTION]
-<!-- Surface projection of the slip distribution superimposed on GEBCO bathymetry. Red lines indicate major plate boundaries [Bird, 2003]. Gray circles, if present, are aftershock locations, sized by magnitude. -->
-</p><hr />
+
 <h2>Scientific Analysis:</h2>
 [COMMENT]
-<hr />
-<h2>Slip Distribution</h2>
-<table width ="600:" border="0" cellspacing="0" >
-<tr>
-   <td colspan=1 width="200" border="1">
-     <a href= "web/static2_out"><B>SUBFAULT FORMAT</b></a>
-   </td>
-   <td colspan=1 width="200" border="1">
-     <a href= "web/CMTSOLUTION"><b>CMTSOLUTION FORMAT</b> </td>
-   </td>
-   <td colspan=1 width="200" border="1">
-     <a href= "web/[EVENT]_coulomb.inp"><b>COULOMB INPUT FORMAT</b> </td>
-   </td>
-   <td colspan=1 width="200" border="1">
-     <a href= "web/[EVENT].kmz"><b>GOOGLE KMZ FORMAT</b> </td>
-</tr>
-</table>
 <hr />
 <h2>References</h2>
 <p>Ji, C., D.J. Wald, and D.V. Helmberger, Source description of the 1999 Hector Mine, California earthquake; Part I: Wavelet domain inversion theory and resolution analysis, <it>Bull. Seism. Soc. Am.</it>, Vol 92, No. 4. pp. 1192-1207, 2002.
