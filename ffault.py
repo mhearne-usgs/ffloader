@@ -52,6 +52,8 @@ FILE_PATTERNS = {'bodywave':'*bwave*.png',
                  'inp':'*.inp',
                  'kml':'*.kml',
                  'kmz':'*.kmz',
+                 'fsp':'*.fsp',
+                 'deformation':'*.disp',
                  'moment_text':'*.param'}
 
 PROCESS_TEMPLATE_LONG = """We used GSN broadband waveforms downloaded from the NEIC waveform server.
@@ -102,23 +104,17 @@ al., 2000).
 
 CONTENTS = """<contents>
   <!-- Full listing of files -->
-  <file title="Base Map" id="basemap">
-    <caption>
-      <![CDATA[ Map of finite fault showing it's geographic context ]]>
-    </caption>
-    <format href="[EVENT]_base.png" type="image/png"/>
-  </file>
 
-  [BODYBLOCK]
-
-  [SURFACEBLOCK]
-
-  <file title="Base Map" id="cmtsolution">
+    <file title="Base Map" id="cmtsolution">
     <caption>
       <![CDATA[ Map of finite fault showing it's geographic context ]]>
     </caption>
     <format href="web[PLANE]/[EVENT]_basemap.png" type="image/png"/>
   </file>
+  
+  [BODYBLOCK]
+
+  [SURFACEBLOCK]
 
   <file title="CMT Solution" id="cmtsolution">
     <caption>
