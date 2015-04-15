@@ -148,7 +148,7 @@ CONTENTS = """<contents>
     <caption>
       <![CDATA[ Ascii file of time vs. moment rate, used for plotting source time function ]]>
     </caption>
-    <format href="web[PLANE]/[EVENT].param" type="text/plain"/>
+    <format href="web[PLANE]/[EVENT].mr" type="text/plain"/>
   </file>
 
   <file title="Surface Deformation File" id="surfacedeformationfile">
