@@ -54,7 +54,7 @@ FILE_PATTERNS = {'bodywave':'*bwave*.png',
                  'kmz':'*.kmz',
                  'fsp':'*.fsp',
                  'deformation':'*.disp',
-                 'moment_text':'*.param'}
+                 'moment_text':'*.mr'}
 
 PROCESS_TEMPLATE_LONG = """We used GSN broadband waveforms downloaded from the NEIC waveform server.
 We analyzed [XX] teleseismic broadband P waveforms, [YY] broadband SH waveforms, 
