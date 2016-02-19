@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+#stdlib imports
 import sys
 import os.path
 import glob
@@ -12,9 +13,12 @@ import getpass
 import subprocess
 import math
 
+#local imports
+from tag import Tag
+
 #PDL command stuff
 JARFILE = 'ProductClient.jar'
-CONFIGFILE = 'config.ini'
+CONFIGFILE = 'dev_config.ini'
 
 #depending on whether user is "gavin" or "mhearne", choose one of these
 DEVPDLPATH = '/Users/%s/ProductClient' % getpass.getuser()
@@ -29,7 +33,7 @@ WEB_MAP_WIDTH = 304
 OUTPUT_BASEMAP = 'basemap.png'
 
 #depending on whether user is "gavin" or "mhearne", choose one of these
-PRODCMD = "java -jar [JARFILE] --configFile=[CONFIGFILE] --send --source=us --type=finite-fault --code=[NET][EVENTCODE] --directory=[FFMDIR] --privateKey=/Users/%s/Desktop/ProductClient/id_dsa_ffm --trackerURL=http://ehppdl1.cr.usgs.gov/tracker/ --eventsource=[NET] --eventsourcecode=[EVENTCODE] [PROPERTIES]" % getpass.getuser()
+PRODCMD = "java -jar [JARFILE] --configFile=[CONFIGFILE] --send --source=us --type=finite-fault --code=[NET][EVENTCODE] --directory=[FFMDIR] --privateKey=/Users/%s/Desktop/ProductClient/id_dsa_ffm  --eventsource=[NET] --eventsourcecode=[EVENTCODE] [PROPERTIES]" % getpass.getuser()
 
 DEVCMD = "java -jar [JARFILE] --configFile=[CONFIGFILE] --send --source=us --type=finite-fault --code=[NET][EVENTCODE] --directory=[FFMDIR] --eventsource=[NET] --eventsourcecode=[EVENTCODE] [PROPERTIES]"
 
@@ -102,62 +106,7 @@ al., 2000).
 <i>Table 1. Multi-Segment Parameters.</i>
 """
 
-CONTENTS = """<contents>
-  <!-- Full listing of files -->
 
-    <file title="Base Map" id="cmtsolution">
-    <caption>
-      <![CDATA[ Map of finite fault showing it's geographic context ]]>
-    </caption>
-    <format href="web[PLANE]/[EVENT]_basemap.png" type="image/png"/>
-  </file>
-  
-  [BODYBLOCK]
-
-  [SURFACEBLOCK]
-
-  <file title="CMT Solution" id="cmtsolution">
-    <caption>
-      <![CDATA[ Full CMT solution for every point in finite fault region ]]>
-    </caption>
-    <format href="web[PLANE]/CMTSOLUTION" type="text/plain"/>
-  </file>
-
-  <file title="Inversion Parameters File 1" id="inpfile1">
-    <caption>
-      <![CDATA[ Basic inversion parameters for each node in the finite fault ]]>
-    </caption>
-    <format href="web[PLANE]/[EVENT].param" type="text/plain"/>
-  </file>
-
-  <file title="Inversion Parameters File 2" id="inpfile2">
-    <caption>
-      <![CDATA[ Complete inversion parameters for the finite fault, following the SRCMOD FSP format (http://equake-rc.info/) ]]>
-    </caption>
-    <format href="web[PLANE]/[EVENT].fsp" type="text/plain"/>
-  </file>
-
-  <file title="Coulomb Input File" id="coulomb">
-    <caption>
-      <![CDATA[ Format necessary for compatibility with Coulomb3 (http://earthquake.usgs.gov/research/software/coulomb/) ]]>
-    </caption>
-    <format href="web[PLANE]/[EVENT]_coulomb.inp" type="text/plain"/>
-  </file>
-  
-  <file title="Moment Rate Function File" id="momentratefile">
-    <caption>
-      <![CDATA[ Ascii file of time vs. moment rate, used for plotting source time function ]]>
-    </caption>
-    <format href="web[PLANE]/[EVENT].mr" type="text/plain"/>
-  </file>
-
-  <file title="Surface Deformation File" id="surfacedeformationfile">
-    <caption>
-      <![CDATA[ Surface displacement resulting from finite fault, calculated using Okada-style deformation codes ]]>
-    </caption>
-    <format href="web[PLANE]/[EVENT].disp" type="text/plain"/>
-  </file>
-</contents>"""
 
 CONTENTSBODYBLOCK = """\n<file title="Body Waves Plot" id="bodywave[V]">
     <caption>
@@ -347,6 +296,174 @@ def generateCmdLine(eventdicts,eventid,output):
     cmd = cmd.replace('[FFMDIR]',output)
     cmd = cmd.replace('[PROPERTIES]',propstr)
     return cmd
+
+def createContentsXML(eventid,outdir,bodywaves1,bodywaves2,surfacewaves1,surfacewaves2):
+    eventcode = eventid[2:]
+    contents = Tag('contents')
+    isTwoPlane = False
+    plane1mod = ''
+    plane1id = ''
+    if len(bodywaves2):
+        isTwoPlane = True
+        plane1mod = '(Plane 1)'
+        plane1id = '1'
+
+    #Base Maps
+    basecaption = "<![CDATA[ Map of finite fault showing it's geographic context ]]>"
+    basemap1tag = Tag('file',attributes={'title':'Base Map %s' % plane1mod,'id':'basemap%s' % plane1id})
+    basemap1tag.addChild(Tag('caption',data=basecaption))
+    basemap1tag.addChild(Tag('format',attributes={'href':'web%s/%s_basemap.png' % (plane1id,eventcode),
+                                                  'type':'image/png'}))
+    contents.addChild(basemap1tag)
+    if isTwoPlane:
+        basemap2tag = Tag('file',attributes={'title':'Base Map (Plane 2)','id':'basemap2'})
+        basemap2tag.addChild(Tag('caption',data=basecaption))
+        basemap2tag.addChild(Tag('format',attributes={'href':'web%s/%s_basemap.png' % (plane1id,eventcode),
+                                                      'type':'image/png'}))
+        contents.addChild(basemap2tag)
+
+    #Body Waves
+    bwavecaption = "<![CDATA[ Multi-panel plot showing body wave data from all contributing stations ]]>"
+    for i in range(0,len(bodywaves1)):
+        bwave = bodywaves1[i]
+        fpath,fname = os.path.split(bwave)
+        bwavetag = Tag('file',attributes={'title':'Body Waves Plot %i %s' % (i,plane1mod),
+                                          'id':'bodywave%i_1' % i})
+        bwavetag.addChild(Tag('caption',data=bwavecaption))
+        bwavetag.addChild(Tag('format',attributes={'href':'web%s/%s' % (plane1id,fname),
+                                                   'type':'image/png'}))
+        contents.addChild(bwavetag)
+    if isTwoPlane:
+        for i in range(0,len(bodywaves2)):
+            bwave = bodywaves2[i]
+            fpath,fname = os.path.split(bwave)
+            bwavetag = Tag('file',attributes={'title':'Body Waves Plot %i (Plane 2)' % (i),
+                                              'id':'bodywave%i_2' % i})
+            bwavetag.addChild(Tag('caption',data=bwavecaption))
+            bwavetag.addChild(Tag('format',attributes={'href':'web2/%s' % (fname),
+                                                       'type':'image/png'}))
+            contents.addChild(bwavetag)
+
+    #Surface Waves
+    swavecaption = "<![CDATA[ Multi-panel plot showing surface wave data from all contributing stations ]]>"
+    for i in range(0,len(surfacewaves1)):
+        swave = surfacewaves1[i]
+        fpath,fname = os.path.split(swave)
+        swavetag = Tag('file',attributes={'title':'Surface Waves Plot %i %s' % (i,plane1mod),
+                                          'id':'surfacewave%i_1' % i})
+        swavetag.addChild(Tag('caption',data=swavecaption))
+        swavetag.addChild(Tag('format',attributes={'href':'web%s/%s' % (plane1id,fname),
+                                                   'type':'image/png'}))
+        contents.addChild(swavetag)
+    if isTwoPlane:
+        for i in range(0,len(surfacewaves2)):
+            swave = surfacewaves2[i]
+            fpath,fname = os.path.split(swave)
+            swavetag = Tag('file',attributes={'title':'Surface Waves Plot %i (Plane 2)' % (i),
+                                              'id':'surfacewave%i_2' % i})
+            swavetag.addChild(Tag('caption',data=swavecaption))
+            swavetag.addChild(Tag('format',attributes={'href':'web2/%s' % (fname),
+                                                       'type':'image/png'}))
+            contents.addChild(swavetag)
+    #CMT Solution
+    cmtcaption = "<![CDATA[ Full CMT solution for every point in finite fault region ]]>"
+    cmt1tag = Tag('file',attributes={'title':'CMT Solution %s' % plane1mod,
+                                    'id':'cmtsolution1'})
+    cmt1tag.addChild(Tag('caption',data=cmtcaption))
+    cmt1tag.addChild(Tag('format',attributes={'href':'web%s/CMTSOLUTION' % plane1id,
+                                               'type':'text/plain'}))
+    contents.addChild(cmt1tag)
+    if isTwoPlane:
+        cmt2tag = Tag('file',attributes={'title':'CMT Solution (Plane 2)',
+                                         'id':'cmtsolution2'})
+        cmt2tag.addChild(Tag('caption',data=cmtcaption))
+        cmt2tag.addChild(Tag('format',attributes={'href':'web2/CMTSOLUTION',
+                                                  'type':'text/plain'}))
+        contents.addChild(cmt2tag)
+
+    #Inversion Parameters File 1
+    inv1caption = "<![CDATA[ Basic inversion parameters for each node in the finite fault ]]>"
+    inv1tag1 = Tag('file',attributes={'title':'Inversion Parameters File 1 %s' % plane1mod,
+                                      'id':'inpfile1_1'})
+    inv1tag1.addChild(Tag('caption',data=inv1caption))
+    inv1tag1.addChild(Tag('format',attributes={'href':'web%s/%s.param' % (plane1id,eventcode),
+                                               'type':'text/plain'}))
+    contents.addChild(inv1tag1)
+    if isTwoPlane:
+        inv1tag2 = Tag('file',attributes={'title':'Inversion Parameters File 1 (Plane 2)',
+                                          'id':'inpfile1_2'})
+        inv1tag2.addChild(Tag('caption',data=inv1caption))
+        inv1tag2.addChild(Tag('format',attributes={'href':'web2/%s.param' % eventcode,
+                                                   'type':'text/plain'}))
+        contents.addChild(inv1tag2)
+
+    #Inversion Parameters File 2
+    inv2caption = "<![CDATA[ Complete inversion parameters for the finite fault, following the SRCMOD FSP format (http://equake-rc.info/) ]]>"
+    inv2tag1 = Tag('file',attributes={'title':'Inversion Parameters File 2 %s' % plane1mod,
+                                      'id':'inpfile2_1'})
+    inv2tag1.addChild(Tag('caption',data=inv2caption))
+    inv2tag1.addChild(Tag('format',attributes={'href':'web%s/%s.fsp' % (plane1id,eventcode),
+                                               'type':'text/plain'}))
+    contents.addChild(inv2tag1)
+    if isTwoPlane:
+        inv2tag2 = Tag('file',attributes={'title':'Inversion Parameters File 2 (Plane 2)',
+                                          'id':'inpfile1_2'})
+        inv2tag2.addChild(Tag('caption',data=inv2caption))
+        inv2tag2.addChild(Tag('format',attributes={'href':'web2/%s.fsp' % eventcode,
+                                                   'type':'text/plain'}))
+        contents.addChild(inv2tag2)
+
+    #Coulomb Input File
+    coucaption = "<![CDATA[ Format necessary for compatibility with Coulomb3 (http://earthquake.usgs.gov/research/software/coulomb/) ]]>"
+    coutag1 = Tag('file',attributes={'title':'Coulomb Input File %s' % plane1mod,
+                                     'id':'coulomb_1'})
+    coutag1.addChild(Tag('caption',data=coucaption))
+    coutag1.addChild(Tag('format',attributes={'href':'web%s/%s_coulomb.inp' % (plane1id,eventcode),
+                                               'type':'text/plain'}))
+    contents.addChild(coutag1)
+    if isTwoPlane:
+        coutag2 = Tag('file',attributes={'title':'Coulomb Input File (Plane 2)',
+                                          'id':'coulomb_2'})
+        coutag2.addChild(Tag('caption',data=coucaption))
+        coutag2.addChild(Tag('format',attributes={'href':'web2/%s_coulomb.inp' % (eventcode),
+                                                  'type':'text/plain'}))
+        contents.addChild(coutag2)
+
+    #Moment Rate Function File
+    momcaption = "<![CDATA[ Ascii file of time vs. moment rate, used for plotting source time function ]]>"
+    momtag1 = Tag('file',attributes={'title':'Moment Rate Function File %s' % plane1mod,
+                                     'id':'momentrate1'})
+    momtag1.addChild(Tag('caption',data=momcaption))
+    momtag1.addChild(Tag('format',attributes={'href':'web%s/%s.mr' % (plane1id,eventcode),
+                                              'type':'text/plain'}))
+    contents.addChild(momtag1)
+    if isTwoPlane:
+        momtag2 = Tag('file',attributes={'title':'Moment Rate Function File (Plane 2)',
+                                          'id':'momentrate2'})
+        momtag2.addChild(Tag('caption',data=momcaption))
+        momtag2.addChild(Tag('format',attributes={'href':'web2/%s.mr' % (eventcode),
+                                                  'type':'text/plain'}))
+        contents.addChild(momtag2)
+
+    #Surface Deformation File
+    defcaption = "<![CDATA[ Surface displacement resulting from finite fault, calculated using Okada-style deformation codes ]]>"
+    deftag1 = Tag('file',attributes={'title':'Surface Deformation File %s' % plane1mod,
+                                     'id':'surface1'})
+    deftag1.addChild(Tag('caption',data=defcaption))
+    deftag1.addChild(Tag('format',attributes={'href':'web%s/%s.disp' % (plane1id,eventcode),
+                                              'type':'text/plain'}))
+    contents.addChild(deftag1)
+    if isTwoPlane:
+        deftag2 = Tag('file',attributes={'title':'Surface Deformation File (Plane 2)',
+                                          'id':'surface2'})
+        deftag2.addChild(Tag('caption',data=momcaption))
+        deftag2.addChild(Tag('format',attributes={'href':'web2/%s.disp' % (eventcode),
+                                                  'type':'text/plain'}))
+        contents.addChild(deftag2)
+
+    cfile = os.path.join(outdir,'contents.xml')
+    contents.renderToXML(cfile)
+    
 
 def createContents(eventid,outdir,bodywaves1,bodywaves2,surfacewaves1,surfacewaves2):
     eventcode = eventid[2:]
@@ -790,7 +907,7 @@ if __name__ == '__main__':
         f.write(htmldata)
         f.close()
         createHTMLFragments([eventdict1,eventdict2],comment,pdlfolder)
-    createContents(eventid,pdlfolder,bodyfiles1,bodyfiles2,surfacefiles1,surfacefiles2)
+    createContentsXML(eventid,pdlfolder,bodyfiles1,bodyfiles2,surfacefiles1,surfacefiles2)
     if not options.doReview:
         if len(args) > 3:
             cmd = generateCmdLine([eventdict1,eventdict2],eventid,pdlfolder)
