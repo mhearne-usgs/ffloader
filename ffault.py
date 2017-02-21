@@ -524,7 +524,7 @@ def getWavePlots(ffmdir):
     return (bodyfiles,surfacefiles)
 
 def fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles,surfacefiles,version,caption,onePlane=True,planeNumber=1):
-    location = getLocation(eventdict['lat'],eventdict['lon'])
+    location = getLocation(eventcode,eventdict['lat'],eventdict['lon'])
     htmldata = htmldata.replace('[DATE]',eventdict['time'].strftime('%b %d, %Y'))
     htmldata = htmldata.replace('[MAG]','%.1f' % eventdict['magnitude'])
     htmldata = htmldata.replace('[LOCATION]','%s' % location)
@@ -598,33 +598,18 @@ def fillHTML(eventdict,htmldata,comment,eventcode,bodyfiles,surfacefiles,version
         
     return htmldata
 
-def getLocation(lat,lon):
-    MAX_DIST = 300
-    urlt = 'http://igskcicgasordb2.cr.usgs.gov:8080/gs_dad/get_gs_info?latitude=LAT&longitude=LON&utc=UTC';
-    url = urlt.replace('LAT','%.4f' % lat)
-    url = url.replace('LON','%.4f' % lon)
-    url = url.replace('UTC',datetime.datetime.utcnow().strftime('%m/%d/%Y:%H:%M:%S'))
+def getLocation(eventcode,lat,lon):
+    URL_TEMPLATE = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/[EVENTID].geojson'
+    url = URL_TEMPLATE.replace('[EVENTID]','us'+eventcode)
     try:
         fh = urllib2.urlopen(url)
-        content = fh.read()
+        data = fh.read()
         fh.close()
-        data = json.loads(content)
-        if data['cities'][0]['distance'] <= MAX_DIST:
-            dist = data['cities'][0]['distance']
-            direc = data['cities'][0]['direction']
-            cname = data['cities'][0]['name']
-            locstr = '%i km %s of %s' % (dist,direc,cname)
-            return locstr
-        try:
-            locstr = data['fe']['longName']
-            return locstr
-        except:
-            dist = data['cities'][0]['distance']
-            direc = data['cities'][0]['direction']
-            cname = data['cities'][0]['name']
-            locstr = '%i km %s of %s' % (dist,direc,cname)
-            return locstr
+        jdict = json.loads(data)
+        locstr = jdict['properties']['place']
     except:
+        pass
+    finally:
         locstr = '%.4f,%.4f' % (lat,lon)
 
     return locstr
