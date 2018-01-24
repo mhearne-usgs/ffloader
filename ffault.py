@@ -608,8 +608,6 @@ def getLocation(eventcode,lat,lon):
         jdict = json.loads(data)
         locstr = jdict['properties']['place']
     except:
-        pass
-    finally:
         locstr = '%.4f,%.4f' % (lat,lon)
 
     return locstr
