@@ -60,7 +60,7 @@ FILE_PATTERNS = {'bodywave':'*bwave*.png',
                  'deformation':'*.disp',
                  'moment_text':'*.mr'}
 
-PROCESS_TEMPLATE_LONG = """We used GSN broadband waveforms downloaded from the NEIC waveform server.
+PROCESS_TEMPLATE_LONG = """We used GSN and FDSN broadband waveforms downloaded from the NEIC waveform server.
 We analyzed [XX] teleseismic broadband P waveforms, [YY] broadband SH waveforms, 
 and [ZZ] long period surface waves selected based on data quality and azimuthal 
 distribution. Waveforms are first converted to displacement by removing the 
@@ -71,7 +71,7 @@ matching or adjusted slightly from the initial NEIC solution (Lon. = [AA] deg.; 
 moment tensor (for near-real time solutions), or the gCMT moment tensor (for 
 historic solutions)."""
 
-PROCESS_TEMPLATE_NOLONG = """We used GSN broadband waveforms downloaded from the NEIC waveform
+PROCESS_TEMPLATE_NOLONG = """We used GSN and FDSN broadband waveforms downloaded from the NEIC waveform
 server.  We analyzed [XX] teleseismic broadband P waveforms and [YY]
 broadband SH waveforms selected based on data quality and azimuthal
 distribution. Waveforms are first converted to displacement by
